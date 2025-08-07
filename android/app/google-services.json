@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "562744545030",
+    "project_id": "bdd-dfguitars",
+    "storage_bucket": "bdd-dfguitars.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562744545030:android:c3546308023a7467709887",
+        "android_client_info": {
+          "package_name": "com.example.dfg_guitar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuNQnutECD0bG3aJo6qWPeFB5Rxkl-Zvs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

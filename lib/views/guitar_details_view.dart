@@ -38,6 +38,7 @@ class GuitarDetailsView extends StatelessWidget {
                 onTap: () {
                   _showImageDialog(context, imageUrl);
                 },
+                //widget pensarle hero
                 child: Hero(
                   tag: 'guitar_image_${guitar['id']}',
                   child: Container(
@@ -54,7 +55,7 @@ class GuitarDetailsView extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
-                      child: Container(
+                      child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         height: MediaQuery.of(context).size.width * 0.9,
                         child: imageUrl.startsWith('http')
@@ -253,7 +254,7 @@ class GuitarDetailsView extends StatelessWidget {
                 boundaryMargin: EdgeInsets.all(20),
                 minScale: 0.5,
                 maxScale: 4.0,
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   height: double.infinity,
                   child: Center(

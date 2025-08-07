@@ -71,7 +71,8 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Ícono principal
+                  // Ícono principal - podemos hacerle widget a parte
+
                   Container(
                     padding: EdgeInsets.all(24),
                     decoration: BoxDecoration(

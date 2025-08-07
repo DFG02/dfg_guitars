@@ -12,7 +12,7 @@ class GuitarListView extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/welcome');
+            Navigator.pushReplacementNamed(context, '/welcome'); //pop
           },
         ),
         title: Text(
@@ -92,7 +92,7 @@ class GuitarListView extends StatelessWidget {
                       // Imagen cuadrada con tamaño fijo
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12.0),
-                        child: Container(
+                        child: SizedBox(
                           width: 240,
                           height: 240,
                           child: imageUrl.startsWith('http')
@@ -271,8 +271,9 @@ class GuitarListView extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
+                 _deleteGuitar(context, guitarId);
                 Navigator.of(context).pop();
-                _deleteGuitar(context, guitarId);
+               
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

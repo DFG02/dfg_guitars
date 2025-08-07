@@ -14,7 +14,7 @@ class GuitarListView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navegar a la vista de agregar guitarra
+          Navigator.pushNamed(context, '/add');
         },
         child: Icon(Icons.add),
       ),

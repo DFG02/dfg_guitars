@@ -9,6 +9,12 @@ class GuitarListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/welcome');
+          },
+        ),
         title: Text(
           'Lista de Guitarras',
           style: TextStyle(

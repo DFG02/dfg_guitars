@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/initialize_catalogs.dart';
 
 class WelcomeView extends StatefulWidget {
   const WelcomeView({super.key});
@@ -48,6 +49,73 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
           ),
         ),
         backgroundColor: Colors.deepPurple,
+        actions: [
+          // Botón de configuración para inicializar catálogos
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white70),
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Configuración de Catálogos'),
+                  content: Text('¿Deseas inicializar los catálogos de guitarras en Firebase?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancelar'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                CircularProgressIndicator(strokeWidth: 2),
+                                SizedBox(width: 16),
+                                Text('Inicializando catálogos...'),
+                              ],
+                            ),
+                          ),
+                        );
+                        
+                        try {
+                          await initializeCatalogs();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Icon(Icons.check_circle, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text('Catálogos inicializados correctamente'),
+                                ],
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Icon(Icons.error, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text('Error: $e'),
+                                ],
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Inicializar'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,

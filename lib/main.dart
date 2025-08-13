@@ -1,19 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'views/guitar_list_view.dart';
 import 'views/add_guitar_view.dart';
 import 'views/edit_guitar_view.dart';
 import 'views/guitar_details_view.dart';
 import 'views/welcome_view.dart';
+import 'utils/initialize_catalogs.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Inicializar catálogos si faltan (no bloquea la UI principal)
+  _ensureCatalogs();
   runApp(const MainApp());
+}
+
+Future<void> _ensureCatalogs() async {
+  try {
+    final firestore = FirebaseFirestore.instance;
+    final needed = ['madera_cuerpo','madera_brazo','tipo_puente'];
+    bool missing = false;
+    for (final id in needed) {
+      final doc = await firestore.collection('catalogos').doc(id).get();
+      if (!doc.exists) { missing = true; break; }
+    }
+    if (missing) {
+      await initializeCatalogs();
+    }
+  } catch (_) {
+    // silencioso
+  }
 }
 
 class MainApp extends StatelessWidget {

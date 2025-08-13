@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'guitar_dropdown_field.dart';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class GuitarForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -30,6 +31,7 @@ class _GuitarFormState extends State<GuitarForm> {
   String? _selectedConfiguracionPastillas;
   String? _selectedTipoPuente;
   String? _imagePath;
+  String? _uploadedImageUrl;
   
   @override
   void initState() {
@@ -63,22 +65,50 @@ class _GuitarFormState extends State<GuitarForm> {
       setState(() {
         _imagePath = pickedFile.path;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Imagen seleccionada'),
-            ],
+      // Upload to Firebase Storage
+      try {
+        final file = File(pickedFile.path);
+        final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        final ref = FirebaseStorage.instance.ref().child('guitar_images/$fileName');
+        await ref.putFile(file);
+        final url = await ref.getDownloadURL();
+        setState(() {
+          _uploadedImageUrl = url;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.cloud_upload, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Imagen subida correctamente'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(child: Text('Error al subir imagen: $e')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
     }
   }
+
+  // Removed dynamic import helper (not needed)
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -90,13 +120,11 @@ class _GuitarFormState extends State<GuitarForm> {
         'madera_brazo': _selectedMaderaBrazo ?? '',
         'configuracion_pastillas': _selectedConfiguracionPastillas ?? '',
         'tipo_puente': _selectedTipoPuente ?? '',
-        'imageUrl': _imagePath ?? '',
+        'imageUrl': _uploadedImageUrl ?? _imagePath ?? '',
       };
-      
       if (widget.initialData != null) {
         formData['id'] = widget.initialData!['id'];
       }
-      
       widget.onSubmit(formData);
     }
   }
@@ -306,9 +334,13 @@ class _GuitarFormState extends State<GuitarForm> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: _imagePath!.startsWith('http')
-                                ? Image.network(_imagePath!, fit: BoxFit.cover)
-                                : Image.file(File(_imagePath!), fit: BoxFit.cover),
+                  child: (_uploadedImageUrl ?? _imagePath) != null
+                    ? (_uploadedImageUrl != null
+                      ? Image.network(_uploadedImageUrl!, fit: BoxFit.cover)
+                      : (_imagePath!.startsWith('http')
+                        ? Image.network(_imagePath!, fit: BoxFit.cover)
+                        : Image.file(File(_imagePath!), fit: BoxFit.cover)))
+                    : SizedBox.shrink(),
                           ),
                         ),
                         SizedBox(height: 12),

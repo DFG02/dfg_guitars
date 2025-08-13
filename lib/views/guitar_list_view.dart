@@ -90,44 +90,52 @@ class GuitarListView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Imagen cuadrada con tamaño fijo
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12.0),
-                        child: SizedBox(
-                          width: 240,
-                          height: 240,
-                          child: imageUrl.startsWith('http')
-                              ? Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: Icon(Icons.broken_image, size: 50, color: Colors.grey[600]),
-                                    );
-                                  },
-                                )
-                              : imageUrl.isNotEmpty
-                                  ? Image.file(
-                                      File(imageUrl),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      color: Colors.grey[300],
-                                      child: Icon(Icons.image, size: 50, color: Colors.grey[600]),
-                                    ),
+                        GestureDetector(
+                          onTap: () {
+                            _showImageDialog(context, imageUrl, guitars[index].id);
+                          },
+                          child: Hero(
+                            tag: 'guitar_image_${guitars[index].id}',
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: SizedBox(
+                                width: 240,
+                                height: 240,
+                                child: imageUrl.startsWith('http')
+                                    ? Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey[300],
+                                            child: Icon(Icons.broken_image, size: 50, color: Colors.grey[600]),
+                                          );
+                                        },
+                                      )
+                                    : imageUrl.isNotEmpty
+                                        ? Image.file(
+                                            File(imageUrl),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Container(
+                                            color: Colors.grey[300],
+                                            child: Icon(Icons.image, size: 50, color: Colors.grey[600]),
+                                          ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
                       SizedBox(width: 12),
                       // Contenido de texto expandido
                       Expanded(
@@ -331,4 +339,156 @@ class GuitarListView extends StatelessWidget {
       );
     });
   }
+
+    void _showImageDialog(BuildContext context, String imageUrl, String id) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.black87,
+            insetPadding: EdgeInsets.all(10),
+            child: Stack(
+              children: [
+                Center(
+                  child: Hero(
+                    tag: 'guitar_image_$id',
+                    child: InteractiveViewer(
+                      panEnabled: true,
+                      boundaryMargin: EdgeInsets.all(20),
+                      minScale: 0.5,
+                      maxScale: 4.0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.95,
+                            maxHeight: MediaQuery.of(context).size.height * 0.85,
+                          ),
+                          child: imageUrl.startsWith('http')
+                              ? Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.contain,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      width: MediaQuery.of(context).size.width * 0.95,
+                                      height: MediaQuery.of(context).size.height * 0.85,
+                                      color: Colors.black54,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                              : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: MediaQuery.of(context).size.width * 0.95,
+                                      height: MediaQuery.of(context).size.height * 0.85,
+                                      color: Colors.black54,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.broken_image, size: 100, color: Colors.white),
+                                            SizedBox(height: 16),
+                                            Text('Error al cargar imagen', style: TextStyle(color: Colors.white)),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : imageUrl.isNotEmpty
+                                  ? Image.file(
+                                      File(imageUrl),
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          width: MediaQuery.of(context).size.width * 0.95,
+                                          height: MediaQuery.of(context).size.height * 0.85,
+                                          color: Colors.black54,
+                                          child: Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.broken_image, size: 100, color: Colors.white),
+                                                SizedBox(height: 16),
+                                                Text('Error al cargar imagen', style: TextStyle(color: Colors.white)),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Container(
+                                      width: MediaQuery.of(context).size.width * 0.95,
+                                      height: MediaQuery.of(context).size.height * 0.85,
+                                      color: Colors.black54,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.image, size: 100, color: Colors.white),
+                                            SizedBox(height: 16),
+                                            Text('Sin imagen disponible', style: TextStyle(color: Colors.white)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Pellizca para hacer zoom • Arrastra para mover',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
 }
